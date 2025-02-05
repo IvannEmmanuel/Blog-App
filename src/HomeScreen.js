@@ -24,20 +24,19 @@ const HomeScreen = ({ route }) => {
   const scrollViewRef = useRef(null);
 
   const fetchPosts = async () => {
-    const { data, error } = await supabase
-      .from("posts")
-      .select(
-        `
-        *,
-        comments:comments(*)
-      `
-      )
-      .order("created_at", { ascending: false });
-    if (error) {
-      console.error("Error fetching posts:", error.message);
-      return;
+    try {
+      const response = await fetch("http://192.168.1.2:5000/fetch-posts");
+
+      if (!response.ok) {
+        console.error("Error fetching posts:", response.statusText);
+        return;
+      }
+
+      const data = await response.json();
+      setPostList(data); // Update the postList state with fetched posts
+    } catch (error) {
+      console.error("Error fetching posts:", error);
     }
-    setPostList(data);
   };
 
   useEffect(() => {
@@ -64,25 +63,34 @@ const HomeScreen = ({ route }) => {
 
   const handlePostSubmit = async () => {
     if (!posts.trim()) return;
-    const { data, error } = await supabase
-      .from("posts")
-      .insert([
-        {
-          user_id: userId,
+
+    try {
+      const response = await fetch("http://192.168.1.2:5000/submit-post", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId,
           post: posts,
           firstName,
           lastName,
-          likes: 0,
-          liked_by: [],
-        },
-      ])
-      .select();
-    if (error) {
-      console.error("Error inserting post:", error.message);
-      return;
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error("Error submitting post:", data.error);
+        return;
+      }
+
+      setPosts(""); // Clear the input field after submission
+
+      // Real-time subscription will automatically update the post list
+    } catch (error) {
+      console.error("Error submitting post:", error);
     }
-    setPosts("");
-    // No need to update postList here as the real-time subscription will handle it
   };
 
   const handleDeletePost = async (postId) => {
@@ -95,16 +103,27 @@ const HomeScreen = ({ route }) => {
         text: "Delete",
         style: "destructive",
         onPress: async () => {
-          const { error } = await supabase
-            .from("posts")
-            .delete()
-            .eq("posts_id", postId);
+          try {
+            const response = await fetch(
+              `http://192.168.1.2:5000/delete-post/${postId}`,
+              {
+                method: "DELETE",
+              }
+            );
 
-          if (error) {
-            console.error("Error deleting post:", error.message);
-            return;
+            const data = await response.json();
+
+            if (!response.ok) {
+              console.error("Error deleting post:", data.error);
+              return;
+            }
+
+            // Post successfully deleted
+            console.log("Post deleted successfully!");
+            // Optionally, you can refresh the post list or update the UI accordingly
+          } catch (error) {
+            console.error("Error deleting post:", error);
           }
-          // No need to update postList here as the real-time subscription will handle it
         },
       },
     ]);
@@ -112,48 +131,75 @@ const HomeScreen = ({ route }) => {
 
   const handleCommentSubmit = async (postId) => {
     if (!commentText.trim()) return;
-    const { data, error } = await supabase
-      .from("comments")
-      .insert([
-        {
-          post_id: postId,
-          user_id: userId,
-          comment: commentText,
-          user_name: `${firstName} ${lastName}`,
+
+    try {
+      const response = await fetch("http://192.168.1.2:5000/submit-comment", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      ])
-      .select();
-    if (error) {
-      console.error("Error submitting comment:", error.message);
-      return;
+        body: JSON.stringify({
+          postId,
+          userId,
+          commentText,
+          firstName,
+          lastName,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error("Error submitting comment:", data.error);
+        return;
+      }
+
+      setCommentText("");
+      fetchPosts(); // Refetch posts to update comments
+    } catch (error) {
+      console.error("Error submitting comment:", error);
     }
-    setCommentText("");
-    fetchPosts(); // Refetch all posts to get the updated comments
   };
 
   const handleLikePost = async (postId, currentLikes, likedBy) => {
-    const isLiked = likedBy.includes(userId);
-    const newLikes = isLiked ? currentLikes - 1 : currentLikes + 1;
+    const isLiked = likedBy.includes(userId); // Check if the post is liked by the user
+    const newLikes = isLiked ? currentLikes - 1 : currentLikes + 1; // Update like count
     const updatedLikedBy = isLiked
-      ? likedBy.filter((id) => id !== userId)
-      : [...likedBy, userId];
+      ? likedBy.filter((id) => id !== userId) // Remove user from the liked list if already liked
+      : [...likedBy, userId]; // Add user to the liked list if not already liked
 
-    const { error } = await supabase
-      .from("posts")
-      .update({ likes: newLikes, liked_by: updatedLikedBy })
-      .eq("posts_id", postId);
-    if (error) {
-      console.error("Error updating likes:", error.message);
-      return;
+    try {
+      const response = await fetch("http://192.168.1.2:5000/like-post", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          postId,
+          userId,
+          currentLikes,
+          likedBy,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error("Error updating likes:", data.error);
+        return;
+      }
+
+      // Update the local post list state
+      setPostList(
+        postList.map((post) =>
+          post.posts_id === postId
+            ? { ...post, likes: newLikes, liked_by: updatedLikedBy } // Update the post object in the state
+            : post
+        )
+      );
+    } catch (error) {
+      console.error("Error submitting like:", error);
     }
-
-    setPostList(
-      postList.map((post) =>
-        post.posts_id === postId
-          ? { ...post, likes: newLikes, liked_by: updatedLikedBy }
-          : post
-      )
-    );
   };
 
   return (
@@ -336,7 +382,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 3.84,
     elevation: 5,
-    marginTop: 30
+    marginTop: 30,
   },
   postInputWrapper: {
     flexDirection: "row",
