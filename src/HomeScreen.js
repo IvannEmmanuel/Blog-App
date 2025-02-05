@@ -22,10 +22,12 @@ const HomeScreen = ({ route }) => {
   const [expandedPost, setExpandedPost] = useState(null);
   const [commentText, setCommentText] = useState("");
   const scrollViewRef = useRef(null);
+  const API_KEY = 'https://bf75ce0d-4042-4320-870f-97f3b3ec9388-00-3utm0q5avvrt4.pike.replit.dev'
+
 
   const fetchPosts = async () => {
     try {
-      const response = await fetch("http://192.168.1.2:5000/fetch-posts");
+      const response = await fetch(`${API_KEY}/fetch-posts`);
 
       if (!response.ok) {
         console.error("Error fetching posts:", response.statusText);
@@ -65,7 +67,7 @@ const HomeScreen = ({ route }) => {
     if (!posts.trim()) return;
 
     try {
-      const response = await fetch("http://192.168.1.2:5000/submit-post", {
+      const response = await fetch(`${API_KEY}/submit-post`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -105,7 +107,7 @@ const HomeScreen = ({ route }) => {
         onPress: async () => {
           try {
             const response = await fetch(
-              `http://192.168.1.2:5000/delete-post/${postId}`,
+              `${API_KEY}/delete-post/${postId}`,
               {
                 method: "DELETE",
               }
@@ -133,7 +135,7 @@ const HomeScreen = ({ route }) => {
     if (!commentText.trim()) return;
 
     try {
-      const response = await fetch("http://192.168.1.2:5000/submit-comment", {
+      const response = await fetch(`${API_KEY}/submit-comment`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -169,7 +171,7 @@ const HomeScreen = ({ route }) => {
       : [...likedBy, userId]; // Add user to the liked list if not already liked
 
     try {
-      const response = await fetch("http://192.168.1.2:5000/like-post", {
+      const response = await fetch(`${API_KEY}/like-post`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
