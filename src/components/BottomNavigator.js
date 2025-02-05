@@ -6,12 +6,10 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 
 // Screens
 import HomeScreen from "../HomeScreen";
-import SettingScreen from "../SettingScreen";
 import ProfileScreen from "../ProfileScreen";
 
 const homeName = "Home";
 const customerName = "Profile";
-const settingsName = "Settings";
 
 const Tab = createBottomTabNavigator();
 
@@ -31,8 +29,6 @@ const Dashboard = ({ route }) => {
             iconName = focused ? "home" : "home-outline";
           } else if (rn === customerName) {
             iconName = focused ? "person" : "person-outline";
-          } else if (rn === settingsName) {
-            iconName = focused ? "settings" : "settings-outline";
           }
 
           return <Ionicons name={iconName} size={20} color={color} />; // Adjust icon size here
@@ -53,11 +49,6 @@ const Dashboard = ({ route }) => {
       <Tab.Screen
         name={customerName}
         component={ProfileScreen}
-        initialParams={{ firstName, lastName, userId }} // Pass params here
-      />
-      <Tab.Screen
-        name={settingsName}
-        component={SettingScreen}
         initialParams={{ firstName, lastName, userId }} // Pass params here
       />
     </Tab.Navigator>

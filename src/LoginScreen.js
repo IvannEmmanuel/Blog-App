@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Alert,
   ActivityIndicator,
+  StatusBar,
 } from "react-native";
 import React, { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
@@ -50,7 +51,7 @@ const LoginScreen = () => {
         throw userDetailsError;
       }
 
-      console.log("Retrieved user_id", userDetails.user_id)
+      console.log("Retrieved user_id", userDetails.user_id);
 
       // Show success message
       Alert.alert("Success", "Logged in successfully!");
@@ -70,53 +71,56 @@ const LoginScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
-      {/* Image Section */}
-      <View style={styles.imageContainer}>
-        <Image source={require("../assets/blog.png")} style={styles.image} />
-      </View>
+    <>
+      <StatusBar backgroundColor="#FFF" barStyle="dark-content" />
+      <View style={styles.container}>
+        {/* Image Section */}
+        <View style={styles.imageContainer}>
+          <Image source={require("../assets/blog.png")} style={styles.image} />
+        </View>
 
-      {/* Input Fields Section */}
-      <View style={styles.inputContainer}>
-        <TextInput
-          placeholder="Email"
-          style={styles.input}
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-        />
-        <TextInput
-          placeholder="Password"
-          secureTextEntry={true} // To hide password input
-          style={styles.input}
-          value={password}
-          onChangeText={setPassword}
-        />
-      </View>
+        {/* Input Fields Section */}
+        <View style={styles.inputContainer}>
+          <TextInput
+            placeholder="Email"
+            style={styles.input}
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+          />
+          <TextInput
+            placeholder="Password"
+            secureTextEntry={true} // To hide password input
+            style={styles.input}
+            value={password}
+            onChangeText={setPassword}
+          />
+        </View>
 
-      {/* Button Section */}
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={handleLogin}
-          disabled={loading}
-        >
-          {loading ? (
-            <ActivityIndicator size="small" color="#000" />
-          ) : (
-            <Text style={styles.buttonText}>Login</Text>
-          )}
-        </TouchableOpacity>
-      </View>
+        {/* Button Section */}
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={handleLogin}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator size="small" color="#000" />
+            ) : (
+              <Text style={styles.buttonText}>Login</Text>
+            )}
+          </TouchableOpacity>
+        </View>
 
-      {/* Create Account Section */}
-      <View style={styles.accountContainer}>
-        <Text style={styles.accountText}>Don't have an account? </Text>
-        <TouchableOpacity onPress={handleSignUp}>
-          <Text style={styles.accountSubText}>Create an account.</Text>
-        </TouchableOpacity>
+        {/* Create Account Section */}
+        <View style={styles.accountContainer}>
+          <Text style={styles.accountText}>Don't have an account? </Text>
+          <TouchableOpacity onPress={handleSignUp}>
+            <Text style={styles.accountSubText}>Create an account.</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+    </>
   );
 };
 
@@ -166,7 +170,7 @@ const styles = StyleSheet.create({
     bottom: 80,
   },
   button: {
-    backgroundColor: "#e2bef7",
+    backgroundColor: "#d083ff",
     padding: 15,
     borderRadius: 10,
     alignItems: "center",

@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
+  StatusBar,
 } from "react-native";
 import { supabase } from "../supabase";
 
@@ -156,152 +157,157 @@ const HomeScreen = ({ route }) => {
   };
 
   return (
-    <View style={styles.container}>
-      <ScrollView ref={scrollViewRef}>
-        {/* Post Input */}
-        <View style={styles.postContainer}>
-          <View style={styles.postInputWrapper}>
-            <View style={styles.userAvatar}>
-              <Text style={styles.avatarText}>{firstName[0]}</Text>
-            </View>
-            <Text style={{ alignSelf: 'center' }}>
-              {firstName} {lastName}
-            </Text>
-          </View>
-          <View style={styles.inputContainer}>
-            <TextInput
-              placeholder="What's happening?"
-              placeholderTextColor="#666"
-              value={posts}
-              onChangeText={setPosts}
-              style={styles.mindText}
-              multiline
-            />
-            <TouchableOpacity
-              style={styles.buttonPost}
-              onPress={handlePostSubmit}
-            >
-              <Text style={styles.buttonText}>Post</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        {/* Posts List */}
-        {postList.map((item) => (
-          <View style={styles.postItem} key={item.posts_id}>
-            <View style={styles.postHeader}>
+    <>
+      <StatusBar backgroundColor="#F7F7F7" barStyle="dark-content" />
+      <View style={styles.container}>
+        <ScrollView ref={scrollViewRef}>
+          {/* Post Input */}
+          <View style={styles.postContainer}>
+            <View style={styles.postInputWrapper}>
               <View style={styles.userAvatar}>
-                <Text style={styles.avatarText}>{item.firstName[0]}</Text>
+                <Text style={styles.avatarText}>{firstName[0]}</Text>
               </View>
-              <View style={styles.postHeaderText}>
-                <Text style={styles.userName}>
-                  {item.firstName} {item.lastName}
-                </Text>
+              <Text style={{ justifyContent: "center", alignSelf: "center" }}>
+                {firstName} {lastName}
+              </Text>
+            </View>
+            <View style={styles.inputContainer}>
+              <TextInput
+                placeholder="What's happening?"
+                placeholderTextColor="#666"
+                value={posts}
+                onChangeText={setPosts}
+                style={styles.mindText}
+                multiline
+              />
+              <TouchableOpacity
+                style={styles.buttonPost}
+                onPress={handlePostSubmit}
+              >
+                <Text style={styles.buttonText}>Post</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* Posts List */}
+          {postList.map((item) => (
+            <View style={styles.postItem} key={item.posts_id}>
+              <View style={styles.postHeader}>
+                <View style={styles.userAvatar}>
+                  <Text style={styles.avatarText}>{item.firstName[0]}</Text>
+                </View>
+                <View style={styles.postHeaderText}>
+                  <Text style={styles.userName}>
+                    {item.firstName} {item.lastName}
+                  </Text>
+                </View>
+                {item.user_id === userId && (
+                  <TouchableOpacity
+                    onPress={() => handleDeletePost(item.posts_id)}
+                    style={styles.deleteButton}
+                  >
+                    <Image
+                      source={require("../assets/delete-icon.png")}
+                      style={styles.deleteIcon}
+                    />
+                  </TouchableOpacity>
+                )}
               </View>
-              {item.user_id === userId && (
+
+              <Text style={styles.postContent}>{item.post}</Text>
+
+              <View style={styles.postActions}>
                 <TouchableOpacity
-                  onPress={() => handleDeletePost(item.posts_id)}
-                  style={styles.deleteButton}
+                  style={styles.actionButton}
+                  onPress={() =>
+                    handleLikePost(
+                      item.posts_id,
+                      item.likes || 0,
+                      item.liked_by || []
+                    )
+                  }
                 >
                   <Image
-                    source={require("../assets/delete-icon.png")}
-                    style={styles.deleteIcon}
+                    source={
+                      item.liked_by?.includes(userId)
+                        ? require("../assets/liked-icon.png")
+                        : require("../assets/like-icon.png")
+                    }
+                    style={[
+                      styles.icon,
+                      item.liked_by?.includes(userId) && styles.likedIcon,
+                    ]}
                   />
+                  <Text style={styles.actionText}>{item.likes || 0}</Text>
                 </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.actionButton}
+                  onPress={() =>
+                    setExpandedPost(
+                      expandedPost === item.posts_id ? null : item.posts_id
+                    )
+                  }
+                >
+                  <Image
+                    source={require("../assets/comment-icon.png")}
+                    style={styles.icon}
+                  />
+                  <Text style={styles.actionText}>
+                    {item.comments?.length || 0}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* Comments Section */}
+              {expandedPost === item.posts_id && (
+                <View style={styles.commentSection}>
+                  <View style={styles.commentInput}>
+                    <TextInput
+                      placeholder="Add a comment..."
+                      value={commentText}
+                      onChangeText={setCommentText}
+                      style={styles.commentTextInput}
+                    />
+                    <TouchableOpacity
+                      style={styles.commentButton}
+                      onPress={() => handleCommentSubmit(item.posts_id)}
+                    >
+                      <Text style={styles.buttonText}>Reply</Text>
+                    </TouchableOpacity>
+                  </View>
+
+                  {item.comments?.map((comment) => (
+                    <View key={comment.id} style={styles.commentItem}>
+                      <View style={styles.smallAvatar}>
+                        <Text style={styles.smallAvatarText}>
+                          {comment.user_name?.[0]}
+                        </Text>
+                      </View>
+                      <View style={styles.commentContent}>
+                        <Text style={styles.commentName}>
+                          {comment.user_name}
+                        </Text>
+                        <Text style={styles.commentText}>
+                          {comment.comment}
+                        </Text>
+                      </View>
+                    </View>
+                  ))}
+                </View>
               )}
             </View>
+          ))}
+        </ScrollView>
 
-            <Text style={styles.postContent}>{item.post}</Text>
-
-            <View style={styles.postActions}>
-              <TouchableOpacity
-                style={styles.actionButton}
-                onPress={() =>
-                  handleLikePost(
-                    item.posts_id,
-                    item.likes || 0,
-                    item.liked_by || []
-                  )
-                }
-              >
-                <Image
-                  source={
-                    item.liked_by?.includes(userId)
-                      ? require("../assets/liked-icon.png")
-                      : require("../assets/like-icon.png")
-                  }
-                  style={[
-                    styles.icon,
-                    item.liked_by?.includes(userId) && styles.likedIcon,
-                  ]}
-                />
-                <Text style={styles.actionText}>{item.likes || 0}</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={styles.actionButton}
-                onPress={() =>
-                  setExpandedPost(
-                    expandedPost === item.posts_id ? null : item.posts_id
-                  )
-                }
-              >
-                <Image
-                  source={require("../assets/comment-icon.png")}
-                  style={styles.icon}
-                />
-                <Text style={styles.actionText}>
-                  {item.comments?.length || 0}
-                </Text>
-              </TouchableOpacity>
-            </View>
-
-            {/* Comments Section */}
-            {expandedPost === item.posts_id && (
-              <View style={styles.commentSection}>
-                <View style={styles.commentInput}>
-                  <TextInput
-                    placeholder="Add a comment..."
-                    value={commentText}
-                    onChangeText={setCommentText}
-                    style={styles.commentTextInput}
-                  />
-                  <TouchableOpacity
-                    style={styles.commentButton}
-                    onPress={() => handleCommentSubmit(item.posts_id)}
-                  >
-                    <Text style={styles.buttonText}>Reply</Text>
-                  </TouchableOpacity>
-                </View>
-
-                {item.comments?.map((comment) => (
-                  <View key={comment.id} style={styles.commentItem}>
-                    <View style={styles.smallAvatar}>
-                      <Text style={styles.smallAvatarText}>
-                        {comment.user_name?.[0]}
-                      </Text>
-                    </View>
-                    <View style={styles.commentContent}>
-                      <Text style={styles.commentName}>
-                        {comment.user_name}
-                      </Text>
-                      <Text style={styles.commentText}>{comment.comment}</Text>
-                    </View>
-                  </View>
-                ))}
-              </View>
-            )}
-          </View>
-        ))}
-      </ScrollView>
-
-      <TouchableOpacity
-        style={styles.scrollToTopButton}
-        onPress={() => scrollViewRef.current?.scrollTo({ y: 0 })}
-      >
-        <Text style={styles.scrollToTopText}>↑</Text>
-      </TouchableOpacity>
-    </View>
+        <TouchableOpacity
+          style={styles.scrollToTopButton}
+          onPress={() => scrollViewRef.current?.scrollTo({ y: 0 })}
+        >
+          <Text style={styles.scrollToTopText}>↑</Text>
+        </TouchableOpacity>
+      </View>
+    </>
   );
 };
 
@@ -330,7 +336,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 3.84,
     elevation: 5,
-    marginTop: 50,
+    marginTop: 30
   },
   postInputWrapper: {
     flexDirection: "row",

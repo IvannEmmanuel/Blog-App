@@ -12,6 +12,7 @@ import React, { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { supabase } from "../supabase"; // Import Supabase client
 import bcrypt from "react-native-bcrypt"; // Import bcrypt
+import { StatusBar } from "expo-status-bar";
 
 const SignUpScreen = () => {
   const navigation = useNavigation();
@@ -65,67 +66,70 @@ const SignUpScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.imageContainer}>
-        <Image source={require("../assets/blog.png")} style={styles.image} />
-      </View>
+    <>
+      <StatusBar backgroundColor="#FFF" barStyle="dark-content" />
+      <View style={styles.container}>
+        <View style={styles.imageContainer}>
+          <Image source={require("../assets/blog.png")} style={styles.image} />
+        </View>
 
-      <View style={styles.inputContainer}>
-        <TextInput
-          placeholder="First Name"
-          style={styles.input}
-          value={firstName}
-          onChangeText={setFirstName}
-        />
-        <TextInput
-          placeholder="Last Name"
-          style={styles.input}
-          value={lastName}
-          onChangeText={setLastName}
-        />
-        <TextInput
-          placeholder="Email"
-          style={styles.input}
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-        />
-        <TextInput
-          placeholder="Password"
-          secureTextEntry
-          style={styles.input}
-          value={password}
-          onChangeText={setPassword}
-        />
-        <TextInput
-          placeholder="Address"
-          style={styles.input}
-          value={address}
-          onChangeText={setAddress}
-        />
-      </View>
+        <View style={styles.inputContainer}>
+          <TextInput
+            placeholder="First Name"
+            style={styles.input}
+            value={firstName}
+            onChangeText={setFirstName}
+          />
+          <TextInput
+            placeholder="Last Name"
+            style={styles.input}
+            value={lastName}
+            onChangeText={setLastName}
+          />
+          <TextInput
+            placeholder="Email"
+            style={styles.input}
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+          />
+          <TextInput
+            placeholder="Password"
+            secureTextEntry
+            style={styles.input}
+            value={password}
+            onChangeText={setPassword}
+          />
+          <TextInput
+            placeholder="Address"
+            style={styles.input}
+            value={address}
+            onChangeText={setAddress}
+          />
+        </View>
 
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={handleSignUp}
-          disabled={loading}
-        >
-          {loading ? (
-            <ActivityIndicator color="#000" />
-          ) : (
-            <Text style={styles.buttonText}>Sign Up</Text>
-          )}
-        </TouchableOpacity>
-      </View>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={handleSignUp}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="#000" />
+            ) : (
+              <Text style={styles.buttonText}>Sign Up</Text>
+            )}
+          </TouchableOpacity>
+        </View>
 
-      <View style={styles.accountContainer}>
-        <Text style={styles.accountText}>Already have an account? </Text>
-        <TouchableOpacity onPress={() => navigation.navigate("LoginScreen")}>
-          <Text style={styles.accountSubText}>Login here.</Text>
-        </TouchableOpacity>
+        <View style={styles.accountContainer}>
+          <Text style={styles.accountText}>Already have an account? </Text>
+          <TouchableOpacity onPress={() => navigation.navigate("LoginScreen")}>
+            <Text style={styles.accountSubText}>Login here.</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+    </>
   );
 };
 
@@ -159,7 +163,7 @@ const styles = StyleSheet.create({
     bottom: 80,
   },
   button: {
-    backgroundColor: "#e2bef7",
+    backgroundColor: "#d083ff",
     padding: 15,
     borderRadius: 10,
     alignItems: "center",
