@@ -1,0 +1,28 @@
+const { createClient } = require("@supabase/supabase-js");
+
+const SUPABASE_URL = "https://kiewtxwqhmhvyzlerwqx.supabase.co";
+const SUPABASE_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtpZXd0eHdxaG1odnl6bGVyd3F4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzg2NDU5NjAsImV4cCI6MjA1NDIyMTk2MH0.6x13yfVmZLLQ0NHhm2Jtkxunp6PZkG9gYbALbuMX800";
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+module.exports = async (req, res) => {
+  const { postId, userId, currentLikes, likedBy } = req.body;
+
+  const isLiked = likedBy.includes(userId);
+  const newLikes = isLiked ? currentLikes - 1 : currentLikes + 1;
+  const updatedLikedBy = isLiked
+    ? likedBy.filter((id) => id !== userId)
+    : [...likedBy, userId];
+
+  const { error } = await supabase
+    .from("posts")
+    .update({ likes: newLikes, liked_by: updatedLikedBy })
+    .eq("posts_id", postId);
+
+  if (error) {
+    return res.status(500).json({ error: error.message });
+  }
+
+  res.json({ success: true, newLikes, updatedLikedBy });
+};
