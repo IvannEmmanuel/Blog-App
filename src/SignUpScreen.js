@@ -23,45 +23,36 @@ const SignUpScreen = () => {
   const [address, setAddress] = useState("");
   const [loading, setLoading] = useState(false); // Add loading state
 
+  const API_KEY = 'https://bf75ce0d-4042-4320-870f-97f3b3ec9388-00-3utm0q5avvrt4.pike.replit.dev'
+
   const handleSignUp = async () => {
     if (!email || !password || !firstName || !lastName || !address) {
       return Alert.alert("Error", "All fields are required!");
     }
 
-    setLoading(true); // Start loading
+    setLoading(true);
 
     try {
-      // Hash password asynchronously
-      const hashedPassword = await new Promise((resolve, reject) => {
-        bcrypt.hash(password, 10, (err, hash) => {
-          if (err) reject(err);
-          resolve(hash);
-        });
+      const response = await fetch(`${API_KEY}/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ firstName, lastName, email, password, address }),
       });
 
-      // Perform sign-up and user data insertion in one step
-      const { data: user, error } = await supabase.auth.signUp({
-        email,
-        password,
-      });
+      const data = await response.json();
 
-      if (error) throw error;
-
-      // Insert user data into the database
-      const { error: dbError } = await supabase
-        .from("users")
-        .insert([
-          { firstName, lastName, email, password: hashedPassword, address },
-        ]);
-
-      if (dbError) throw dbError;
+      if (!response.ok) {
+        throw new Error(data.error || "Registration failed");
+      }
 
       Alert.alert("Success", "Account created successfully!");
       navigation.navigate("LoginScreen");
     } catch (error) {
       Alert.alert("Error", error.message);
     } finally {
-      setLoading(false); // Stop loading
+      setLoading(false);
     }
   };
 

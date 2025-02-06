@@ -193,7 +193,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#F7F7F7",
-    padding: width * 0.04, // 4% of screen width
+    top: height * 0.05,
+    padding: width * 0.06, // 4% of screen width
   },
   loadingContainer: {
     flex: 1,

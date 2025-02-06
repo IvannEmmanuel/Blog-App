@@ -21,6 +21,8 @@ const LoginScreen = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false); // Add loading state
 
+  const API_KEY = 'https://bf75ce0d-4042-4320-870f-97f3b3ec9388-00-3utm0q5avvrt4.pike.replit.dev'
+
   // Handle Sign Up Navigation
   const handleSignUp = () => {
     navigation.navigate("SignUpScreen");
@@ -29,38 +31,32 @@ const LoginScreen = () => {
   // Handle Login
   const handleLogin = async () => {
     setLoading(true); // Start loading
+
     try {
-      // Attempt to log in with email and password
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+      const response = await fetch(`${API_KEY}/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
       });
 
-      if (error) {
-        throw error;
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Login failed.");
       }
 
-      // Fetch user details from the "users" table in Supabase
-      const { data: userDetails, error: userDetailsError } = await supabase
-        .from("users")
-        .select("user_id, firstName, lastName")
-        .eq("email", email)
-        .single();
-
-      if (userDetailsError) {
-        throw userDetailsError;
-      }
-
-      console.log("Retrieved user_id", userDetails.user_id);
+      console.log("Retrieved user_id:", result.user.userId);
 
       // Show success message
       Alert.alert("Success", "Logged in successfully!");
 
       // Navigate to HomeScreen and pass user details as params
       navigation.navigate("BottomNavigator", {
-        userId: userDetails.user_id,
-        firstName: userDetails.firstName,
-        lastName: userDetails.lastName,
+        userId: result.user.userId,
+        firstName: result.user.firstName,
+        lastName: result.user.lastName,
       });
     } catch (error) {
       // Show error message
