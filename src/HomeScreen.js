@@ -22,7 +22,7 @@ const HomeScreen = ({ route }) => {
   const [expandedPost, setExpandedPost] = useState(null);
   const [commentText, setCommentText] = useState("");
   const scrollViewRef = useRef(null);
-  const API_KEY = 'https://bf75ce0d-4042-4320-870f-97f3b3ec9388-00-3utm0q5avvrt4.pike.replit.dev'
+  const API_KEY = 'https://backend-blog-sigma.vercel.app/'
 
 
   const fetchPosts = async () => {
