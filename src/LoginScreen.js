@@ -21,7 +21,7 @@ const LoginScreen = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false); // Add loading state
 
-  const API_KEY = 'https://bf75ce0d-4042-4320-870f-97f3b3ec9388-00-3utm0q5avvrt4.pike.replit.dev'
+  const API_KEY = 'https://backend-blog-sigma.vercel.app/'
 
   // Handle Sign Up Navigation
   const handleSignUp = () => {
